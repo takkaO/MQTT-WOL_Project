@@ -1,0 +1,57 @@
+html, body {
+	height: 100%;
+}
+
+.panel-title {
+	text-align: center;
+}
+
+.custom-switch {
+	margin-bottom: 5px;
+}
+
+.pubsub_panel > .btn {
+	width: 49.4%;
+}
+
+.parent_panel {
+	background: #696969; 
+	display: table; 
+	width: 100%; 
+	height: 100vh; 
+	border-collapse: collapse;
+}
+
+.child_panel {
+	background: rgb(155, 155, 155); 
+	display: table-cell; 
+	width: 50%; 
+	height: 100%;
+}
+
+
+.connect_panel {
+	background: rgb(117, 117, 117); 
+	padding: 10px;
+}
+
+.separator {
+	background: rgb(41, 41, 41); 
+	height: 2px;
+}
+
+.pubsub_panel {
+	background: rgb(117, 117, 117); 
+	padding: 10px;
+}
+
+.parent_panel > .child_panel > .form-group {
+	margin: 10px;
+	height: 95%;
+}
+
+.parent_panel > .child_panel > .form-group > .form-control {
+	background:#202020; 
+	color: rgb(28, 209, 82); 
+	height: 100%;
+}

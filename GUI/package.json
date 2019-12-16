@@ -1,0 +1,26 @@
+{
+  "name": "mqtt-wol_gui",
+  "version": "1.0.0",
+  "private": true,
+  "description": "",
+  "main": "main.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "./node_modules/.bin/electron.cmd .",
+    "set_env": "npm install --vs2015 -g windows-build-tools",
+    "mybuild": "./node_modules/.bin/electron-rebuild",
+    "pack_win": "./node_modules/.bin/electron-packager . --overwrite  --asar --out=release NONAME --platform=win32 --arch=x64",
+    "pack_mac": "./node_modules/.bin/electron-packager . --overwrite --asar --out=release NONAME --platform=darwin --arch=x64"
+  },
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "config": "^3.2.4",
+    "electron": "^7.1.5",
+    "electron-packager": "^14.1.1",
+    "electron-rebuild": "^1.8.8"
+  },
+  "dependencies": {
+    "mqtt": "^3.0.0"
+  }
+}

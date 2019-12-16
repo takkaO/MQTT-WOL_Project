@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+	<html>
+
+	<head>
+		<meta charset="UTF-8">
+		<title> MQTT-WOL GUI </title>
+
+		<!-- ユーザCSSの読み込み -->
+		<link rel="stylesheet" type="text/css" href="./css/index.css">
+		<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+
+		
+		<!-- コンテンツ・セキュリティ・ポリシーを設定 -->
+		<meta http-equiv="Content-Security-Policy" content="default-src 'self' https://stackpath.bootstrapcdn.com https://code.jquery.com https://cdnjs.cloudflare.com;
+			img-src 'self' data: image/svg+xml;">
+	</head>
+
+	<body>
+		<div class="parent_panel">
+			<div class="child_panel">
+		
+				<div class="form-group">
+					<textarea id="textarea_mqtt" class="form-control" readonly>
+					</textarea>
+				</div>
+
+			</div>
+
+			<div class="child_panel">
+				<div class="connect_panel">
+
+					<h3 class="panel-title">Broker Settings</h3>
+
+					<div class="input-group mb-3">
+						<div class="input-group-prepend">
+							<span class="input-group-text" id="basic-addon1">Host</span>
+						</div>
+						<input id="form_host" type="text" class="form-control" placeholder="Host" aria-label="Host" aria-describedby="basic-addon1">
+					</div>
+
+					<div class="input-group mb-3">
+						<div class="input-group-prepend">
+							<span class="input-group-text" id="basic-addon1">Port</span>
+						</div>
+						<input id="form_port" type="number" class="form-control" placeholder="Port" aria-label="Port" aria-describedby="basic-addon1">
+					</div>
+
+					<div class="input-group mb-3">
+						<div class="input-group-prepend">
+							<span class="input-group-text" id="basic-addon1">User name</span>
+						</div>
+						<input id="form_uname" type="text" class="form-control" placeholder="User name" aria-label="Uname" aria-describedby="basic-addon1">
+					</div>
+
+					<div class="input-group mb-3">
+						<div class="input-group-prepend">
+							<span class="input-group-text" id="basic-addon1">Password</span>
+						</div>
+						<input id="form_password" type="password" class="form-control" placeholder="Password" aria-label="Password" aria-describedby="basic-addon1">
+					</div>
+
+					<button id="btn_connect" type="button" class="btn btn-dark btn-block">Connect</button>
+
+				</div>
+
+				<div class="separator"></div>
+
+				<div class="pubsub_panel">
+					<h3 class="panel-title">Message Settings</h3>
+
+					<div class="input-group mb-3">
+						<div class="input-group-prepend">
+							<span class="input-group-text" id="basic-addon1">Topic</span>
+						</div>
+						<input id="form_topic" type="text" class="form-control" placeholder="Topic" aria-label="Topic" aria-describedby="basic-addon1">
+					</div>
+
+					<div class="input-group mb-3">
+						<div class="input-group-prepend">
+							<span class="input-group-text" id="basic-addon1">MAC</span>
+						</div>
+						<input id="form_mac" type="text" class="form-control" placeholder="MAC" aria-label="MAC" aria-describedby="basic-addon1">
+					</div>
+
+					<div class="custom-control custom-switch">
+						<input type="checkbox" checked="true" class="custom-control-input" id="switch_sub_with_pub">
+						<label class="custom-control-label" for="switch_sub_with_pub">Subscribe with publish</label>
+					</div>
+
+					<div class="custom-control custom-switch">
+						<input type="checkbox" checked="true" class="custom-control-input" id="switch_parse_json">
+						<label class="custom-control-label" for="switch_parse_json">Parse payload as a JSON format</label>
+					</div>
+
+					<button id="btn_subscribe" type="button" class="btn btn-light">Subscribe</button>
+					<button id="btn_publish" type="button" class="btn btn-dark">Publish</button>
+
+				</div>
+			</div>
+
+
+		</div>
+
+		<!-- load js -->
+		<script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
+		<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
+
+		<script defer src="index.js"></script>
+	</body>
+
+	</html>

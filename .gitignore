@@ -1,2 +1,8 @@
 __pycache__
 BrokerSetting.ini
+
+GUI/release/
+GUI/node_modules/
+GUI/.vscode/
+GUI/*.json
+!GUI/package.json

@@ -2,6 +2,8 @@
 
 ![CUI](https://github.com/takkaO/MQTT-WOL_Project/blob/images/cui.png)
 
+## Environment
+```
 python3 -m pip install psutil paho-mqtt
 ```
 
@@ -12,6 +14,7 @@ py main.py
 ```
 Transmit MQTT data to connected broker.  
 ```payload``` expected **json** format and MAC address separator expected **```:```** or **```-```** or **blank**.  
+Please use GUI application for easy use.  
 ```
 topic  : takkaO/wol 
 payload: {"mac": "target_mac_address"}

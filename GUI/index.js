@@ -1,5 +1,7 @@
 "use strict";
 
+import { isObject } from "util";
+
 const ipcRenderer = window.ipcRenderer;
 const remote = window.remote;
 // Load modules
@@ -185,6 +187,14 @@ ipcRenderer.on("ch_settings", (evt, identifier) => {
 			break;
 	}
 });
+
+function fetchJsonData(json, count = 0){
+	Object.keys(json).forEach((key) => {
+		if (isObject(key)) {
+			fetchJsonData(json, count+1)
+		}
+	});
+}
 
 ipcRenderer.on("ch_mqtt", function (evt, identifier, msg){
 	if (identifier === "message") {

@@ -1,7 +1,5 @@
 "use strict";
 
-import { isObject } from "util";
-
 const ipcRenderer = window.ipcRenderer;
 const remote = window.remote;
 // Load modules
@@ -53,6 +51,29 @@ function switchButtonState(connected){
 		btn_subscribe.disabled = true;
 		btn_connect.textContent = "Connect";
 	}
+}
+
+function fetchJsonDataString(json, count = 0) {
+	if (typeof json === "string") {
+		try {
+			json = JSON.parse(json);
+		}
+		catch (e) {
+			return "Error";
+		}
+	}
+	var str = "";
+	Object.keys(json).forEach((key) => {
+		str += " ".repeat(4).repeat(count);
+		if (json[key] instanceof Object) {
+			str += key + "\n";
+			str += fetchJsonDataString(json[key], count + 1)
+		}
+		else {
+			str += key + ": " + json[key] + "\n";
+		}
+	});
+	return str;
 }
 
 function updateMqttConsole(identifier, msg){
@@ -188,22 +209,12 @@ ipcRenderer.on("ch_settings", (evt, identifier) => {
 	}
 });
 
-function fetchJsonData(json, count = 0){
-	Object.keys(json).forEach((key) => {
-		if (isObject(key)) {
-			fetchJsonData(json, count+1)
-		}
-	});
-}
-
 ipcRenderer.on("ch_mqtt", function (evt, identifier, msg){
 	if (identifier === "message") {
 		var tmp = "topic: " + msg["topic"] + "\n";
 		if (sw_parse_json.checked === true) {
 			var json = JSON.parse(msg["payload"]);
-			Object.keys(json).forEach((key) => {
-				tmp += key + ": " + json[key] + "\n";
-			});
+			tmp = fetchJsonDataString(json);
 		}
 		else {
 			tmp += "payload: " + msg["payload"] + "\n";

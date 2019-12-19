@@ -2,6 +2,15 @@
 
 ![CUI](https://github.com/takkaO/MQTT-WOL_Project/blob/images/cui.png)
 
+## Description
+This program will broadcast Wake On Lan magic packet into same segment network.  
+The trigger of transmit is specific MQTT message.  
+
+- **main.py**  
+This program is receiver, so it can receive specific MQTT message and broadcast WOL magic packet into selected network.  
+- **GUI directory**  
+This program is transmitter, so it can transmit specific MQTT message and receive various MQTT messages.
+
 ## Environment
 ```
 python3 -m pip install psutil paho-mqtt

@@ -201,8 +201,6 @@ ipcRenderer.on("ch_settings", (evt, identifier) => {
 				err += "Invalid key structure\n";
 				updateMqttConsole("error", err);
 			}
-			
-
 			break;
 		default:
 			break;

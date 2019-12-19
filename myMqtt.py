@@ -99,6 +99,8 @@ class MyMqtt():
 		return True if 1 < num and num < 65536 else False
 
 	def check_ip_address(self, s):
+		if s == "localhost":
+			return True
 		ip_reg = r"[1-9][0-9]{0,2}\.[1-9][0-9]{0,2}\.[1-9][0-9]{0,2}\.[1-9][0-9]{0,2}$"
 		m = re.match(ip_reg, s)
 		if m is None:

@@ -6,6 +6,7 @@ const {remote, BrowserWindow} = require('electron');
 var client = null;
 var channel = "ch_mqtt";
 var mainWindow = BrowserWindow.getFocusedWindow();
+var sub_topic_array = [];
 
 const mqttUtils = {
 	testout: function (){
@@ -56,7 +57,6 @@ const mqttUtils = {
 			msg += "Host     : " + options.host + "\n";
 			msg += "Port     : " + options.port + "\n";
 			msg += "Protocol : " + options.protocol + "\n";
-			msg += "----------\n";
 			mainWindow.webContents.send(channel, "connect", msg);
 			//client.publish("test", "test OK");
 			//setInterval(mqttUtils.testout, 1000);
@@ -86,7 +86,6 @@ const mqttUtils = {
 			msg += "QoS    : " + packet.qos + "\n";
 			msg += "Topic  : " + packet.topic + "\n";
 			msg += "Payload: " + packet.payload + "\n";
-			msg += "----------\n"
 			//console.log(BrowserWindow.getAllWindows());
 			mainWindow.webContents.send(channel, "publish", msg);
 			//console.log(packet.payload);
@@ -108,11 +107,33 @@ const mqttUtils = {
 		}
 	},
 
+	isSubscribe: (topic) => {
+		if (sub_topic_array.indexOf(topic) < 0){
+			return false;
+		}
+		return true;
+	},
+
 	subscribe: function (topic) {
 		if (client === null){
 			return;
 		}
-		client.subscribe(topic);
+		if (sub_topic_array.indexOf(topic) < 0){
+			client.subscribe(topic);
+			sub_topic_array.push(topic);
+		}
+	},
+
+	unsubscribe: (topic) => {
+		// no tested!
+		if (client === null){
+			return;
+		}
+		var index = sub_topic_array.indexOf(topic);
+		if (index >= 0){
+			client.unsubscribe(topic);
+			sub_topic_array.splice(index, 1);
+		}
 	},
 
 	publish: function (topic, payload){

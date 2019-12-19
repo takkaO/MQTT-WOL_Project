@@ -23,34 +23,53 @@ var sw_parse_json = document.getElementById("switch_parse_json");
 
 
 function initialize(){
-	switchButtonState(false);
+	switchButtonState("disconnect");
 	form_port.value = "1883";
 	mqtt_console.value = "System Ready...\n";
 };
 
-function switchButtonState(connected){
-	if (connected) {
-		form_host.disabled = true;
-		form_port.disabled = true;
-		form_uname.disabled = true;
-		form_password.disabled = true;
-		form_topic.disabled = false;
-		form_mac.disabled = false;
-		btn_publish.disabled = false;
-		btn_subscribe.disabled = false;
-		btn_connect.textContent = "Disconnect";
+function switchButtonState(broker_connect_state){
+	switch (broker_connect_state) {
+		case "connecting":
+			form_host.disabled = true;
+			form_port.disabled = true;
+			form_uname.disabled = true;
+			form_password.disabled = true;
+			form_topic.disabled = true;
+			form_mac.disabled = true;
+			btn_publish.disabled = true;
+			btn_subscribe.disabled = true;
+			btn_connect.disabled = true;
+			btn_connect.textContent = "Connecting...";
+			break;
+		case "connected":
+			form_host.disabled = true;
+			form_port.disabled = true;
+			form_uname.disabled = true;
+			form_password.disabled = true;
+			form_topic.disabled = false;
+			form_mac.disabled = false;
+			btn_publish.disabled = false;
+			btn_subscribe.disabled = false;
+			btn_connect.disabled = false;
+			btn_connect.textContent = "Disconnect";
+			break;
+		case "disconnect":
+			form_host.disabled = false;
+			form_port.disabled = false;
+			form_uname.disabled = false;
+			form_password.disabled = false;
+			form_topic.disabled = true;
+			form_mac.disabled = true;
+			btn_publish.disabled = true;
+			btn_subscribe.disabled = true;
+			btn_connect.disabled = false;
+			btn_connect.textContent = "Connect";
+			break;
+		default:
+			break;
 	}
-	else{
-		form_host.disabled = false;
-		form_port.disabled = false;
-		form_uname.disabled = false;
-		form_password.disabled = false;
-		form_topic.disabled = true;
-		form_mac.disabled = true;
-		btn_publish.disabled = true;
-		btn_subscribe.disabled = true;
-		btn_connect.textContent = "Connect";
-	}
+
 }
 
 function fetchJsonDataString(json, count = 0) {
@@ -84,12 +103,19 @@ function updateMqttConsole(identifier, msg){
 		case "error":
 			mqtt_console.value += "\n[Error] " + msg;
 			break;
+		case "warning":
+			mqtt_console.value += "[Warning] " + msg;
+			break;
 		case "clear":
-			mqtt_console.value = "[Info] Clear console\n";
+			mqtt_console.value = "[Info] Clear console";
 			break;
 		default:
-			mqtt_console.value += msg + "\n";
+			mqtt_console.value += msg;
 	}
+	if (msg.slice(-1) !== "\n") {
+		mqtt_console.value += "\n";
+	}
+	mqtt_console.value += "--------------------\n";
 
 	/* 最大履歴の管理 */
 	const maxLength = 10000;
@@ -195,33 +221,35 @@ ipcRenderer.on("ch_mqtt", function (evt, identifier, msg){
 	var id = "";
 	var str = msg;
 
-	if (identifier === "message") {
-		str = "Received message!\n";
-		str += "topic: " + msg["topic"] + "\n";
-		if (sw_parse_json.checked === true) {
-			try {
-				var json = JSON.parse(msg["payload"]);
-				str += "payload: \n";
-				str += fetchJsonDataString(json);
-			}
-			catch(e) {
-				str += "[Error] Json parse error!\n";
-				str += "payload: " + msg["payload"] + "\n";
-			}
-		}
-		else {
-			str += "payload: " + msg["payload"] + "\n";
-		}
-		str += "----------\n";
-	}
-
 	switch (identifier) {
 		case "connect":
 			id = "clear";
 			updateMqttConsole(id, "");
-			//fall through
+			switchButtonState("connected");
+			id = "info";
+			break;
 		case "publish":
+			id = "info";
+			break;
 		case "message":
+			id = "info";
+			str = "Received message!\n";
+			str += "topic: " + msg["topic"] + "\n";
+			if (sw_parse_json.checked === true) {
+				try {
+					var json = JSON.parse(msg["payload"]);
+					str += "payload: \n";
+					str += fetchJsonDataString(json);
+				}
+				catch(e) {
+					str += "[Error] Json parse error!\n";
+					str += "payload: " + msg["payload"] + "\n";
+				}
+			}
+			else {
+				str += "payload: " + msg["payload"] + "\n";
+			}
+			break;
 		case "disconnect":
 			id = "info";
 			break;
@@ -238,7 +266,7 @@ ipcRenderer.on("ch_mqtt", function (evt, identifier, msg){
 		str = "Disconnect from broker.\n";
 		updateMqttConsole("info", str);
 		myMqtt.disconnect();
-		switchButtonState(false);
+		switchButtonState("disconnect");
 	}
 });
 
@@ -249,14 +277,15 @@ btn_publish.addEventListener("click", ()=>{
 	if (checkMacAddress(payload) === false) {
 		msg = "Invalid MAC address\n";
 		msg += "Separator expected ' : ' or ' - ' or blank\n";
-		updateMqttConsole("error", msg);
-		return;
+		updateMqttConsole("warning", msg);
 	}
 	var data = JSON.stringify({"mac": payload});
 	if (sw_sub_with_pub.checked === true) {
-		myMqtt.subscribe(topic);
-		var msg = "Start subscribe topic: " + topic + "\n";
-		updateMqttConsole("subscribe", msg);
+		if (myMqtt.isSubscribe(topic) === false) {
+			myMqtt.subscribe(topic);
+			var msg = "Start subscribe topic: " + topic + "\n";
+			updateMqttConsole("info", msg);
+		}
 	}
 	myMqtt.publish(topic, data);
 });
@@ -266,14 +295,21 @@ btn_subscribe.addEventListener("click", ()=>{
 	if (topic === "") {
 		return;
 	}
-	myMqtt.subscribe(topic);
-	var msg = "Start subscribe topic: " + topic + "\n";
-	updateMqttConsole("subscribe", msg);
+	var msg = "";
+	if (myMqtt.isSubscribe(topic) === false) {
+		myMqtt.subscribe(topic);
+		msg = "Start subscribe topic: " + topic + "\n";
+		updateMqttConsole("info", msg);
+	}
+	else{
+		msg = "This topic already subscribed: " + topic + "\n";
+		updateMqttConsole("warning", msg);
+	}
 });
 
 btn_connect.addEventListener("click", ()=>{
 	if (myMqtt.isConnected() === false){
-		switchButtonState(true);
+		switchButtonState("connecting");
 		var host = form_host.value;
 		var port = form_port.value;
 		var uname = form_uname.value;
@@ -281,14 +317,14 @@ btn_connect.addEventListener("click", ()=>{
 		if (myMqtt.isPortNumber(port) == false){
 			var msg = "Invalid port number\n";
 			updateMqttConsole("error", msg);
-			switchButtonState(false);
+			switchButtonState("disconnect");
 			return;
 		}
 		myMqtt.connect(host, Number(port), uname, pass);
 	}
 	else {
 		myMqtt.disconnect();
-		switchButtonState(false);
+		switchButtonState("disconnect");
 	}
 });
 

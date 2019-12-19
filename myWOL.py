@@ -16,6 +16,12 @@ class WakeOnLan:
 		self.sep = '' # MAC address separator
 		self.network_if = self.Adapter()
 	
+	@property
+	def last_mac_address_separator(self, mac=None):
+		if not mac is None:
+			self.is_mac_address(mac)
+		return self.sep
+	
 	def is_mac_address(self, mac, update_sep = True):
 		pattern = r"([0-9A-Fa-f]{2}[-:\s]){5}[0-9A-Fa-f]{2}"
 		result = re.match(pattern, mac)

@@ -10,13 +10,24 @@ const template = [
 			{
 				label: "Load setting",
 				click() {
-					mainWindow.webContents.send("ch_settings", "load");
+					mainWindow.webContents.send("ch_menu", "load_settings");
 				}
 			},
 			{
 				label: "Save setting",
 				click() {
-					mainWindow.webContents.send("ch_settings", "save");
+					mainWindow.webContents.send("ch_menu", "save_settings");
+				}
+			}
+		]
+	},
+	{
+		label: "Console",
+		submenu : [
+			{
+				label: "Clear console",
+				click() {
+					mainWindow.webContents.send("ch_menu", "clear_console");
 				}
 			}
 		]

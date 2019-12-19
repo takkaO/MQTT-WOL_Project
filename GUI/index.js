@@ -77,33 +77,15 @@ function fetchJsonDataString(json, count = 0) {
 }
 
 function updateMqttConsole(identifier, msg){
-	if (mqtt_console.value === null) {
-		mqtt_console.value = "";
-	}
 	switch (identifier) {
-		case "connect":
-			mqtt_console.value = "[Info] " + msg;
-			break;
-		case "disconnect":
-			mqtt_console.value += "\n[Info] " + msg;
-			myMqtt.disconnect();
-			switchButtonState(false);
+		case "info":
+			mqtt_console.value += "[Info] " + msg;
 			break;
 		case "error":
 			mqtt_console.value += "\n[Error] " + msg;
 			break;
-		case "subscribe":
-			mqtt_console.value += "[Info] " + msg;
-			break;
-		case "publish":
-			mqtt_console.value += "[Info] " + msg;
-			break;
-		case "message":
-			mqtt_console.value += "[Info] Receive message!\n";
-			mqtt_console.value += msg;
-			break;
 		case "clear":
-			mqtt_console.value = "";
+			mqtt_console.value = "[Info] Clear console\n";
 			break;
 		default:
 			mqtt_console.value += msg + "\n";
@@ -136,9 +118,9 @@ function checkMacAddress(mac){
 	return true;
 }
 
-ipcRenderer.on("ch_settings", (evt, identifier) => {
+ipcRenderer.on("ch_menu", (evt, identifier) => {
 	switch (identifier) {
-		case "save":
+		case "save_settings":
 			var data = {
 				"broker" : {
 					"host": form_host.value,
@@ -169,7 +151,7 @@ ipcRenderer.on("ch_settings", (evt, identifier) => {
 			updateMqttConsole("info", msg);
 			
 			break;
-		case "load":
+		case "load_settings":
 			var fpath = dialog.showOpenDialogSync(null, {
 				properties: ['openFile'],
 				title: 'Select a setting file',
@@ -202,30 +184,61 @@ ipcRenderer.on("ch_settings", (evt, identifier) => {
 				updateMqttConsole("error", err);
 			}
 			break;
+		case "clear_console":
+			updateMqttConsole("clear", "");
 		default:
 			break;
 	}
 });
 
 ipcRenderer.on("ch_mqtt", function (evt, identifier, msg){
+	var id = "";
+	var str = msg;
+
 	if (identifier === "message") {
-		var tmp = "topic: " + msg["topic"] + "\n";
+		str = "Received message!\n";
+		str += "topic: " + msg["topic"] + "\n";
 		if (sw_parse_json.checked === true) {
-			var json = JSON.parse(msg["payload"]);
-			tmp = fetchJsonDataString(json);
+			try {
+				var json = JSON.parse(msg["payload"]);
+				str += "payload: \n";
+				str += fetchJsonDataString(json);
+			}
+			catch(e) {
+				str += "[Error] Json parse error!\n";
+				str += "payload: " + msg["payload"] + "\n";
+			}
 		}
 		else {
-			tmp += "payload: " + msg["payload"] + "\n";
+			str += "payload: " + msg["payload"] + "\n";
 		}
-		msg = tmp;
-		msg += "----------\n";
+		str += "----------\n";
+	}
+
+	switch (identifier) {
+		case "connect":
+			id = "clear";
+			updateMqttConsole(id, "");
+			//fall through
+		case "publish":
+		case "message":
+		case "disconnect":
+			id = "info";
+			break;
+		case "error":
+			id = "error";
+			break;
+		default:
+			id = "unknown";
 	}
 	
-	updateMqttConsole(identifier, msg);
+	updateMqttConsole(id, str);
 
-	if (identifier === "error") {
-		msg = "Disconnect from broker.\n";
-		updateMqttConsole("disconnect", msg);
+	if (id === "error") {
+		str = "Disconnect from broker.\n";
+		updateMqttConsole("info", str);
+		myMqtt.disconnect();
+		switchButtonState(false);
 	}
 });
 

@@ -11,11 +11,11 @@ class WakeUpper:
 		self.wol = WakeOnLan()
 		self.wol.select_network_interface()
 		self.topic = "takkaO/wol"
-		self.mnlookup_file = "./mns.ini"
+		self.mnlookup_file = "./nrs.ini"
 
 		if not os.path.isfile(self.mnlookup_file):
 			config = configparser.ConfigParser()
-			config["mns"] = {"nick_name" : "xx:xx:xx:xx:xx:xx"}
+			config["NicknameResolutionService"] = {"nick_name" : "xx:xx:xx:xx:xx:xx"}
 			with open(self.mnlookup_file, 'w') as configfile:
 				config.write(configfile)
 	
@@ -30,7 +30,7 @@ class WakeUpper:
 		if not self.wol.is_mac_address(mac):
 			config = configparser.ConfigParser()
 			config.read(self.mnlookup_file)
-			mac = config["mns"][mac]
+			mac = config["NicknameResolutionService"][mac]
 			#print("Load mac from config")
 
 		if self.wol.is_mac_address(mac):

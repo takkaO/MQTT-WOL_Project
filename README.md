@@ -40,6 +40,20 @@ payload: {"mac": "AA-BB-CC-DD-EE-FF"}
 payload: {"mac": "77 88 99 AA BB CC"}
 ```
 
+### Nickname Resolution Service
+You can send nickname instead of MAC address if you were register pair of nicknames and MAC addresses beforehand.  
+Open ```nrs.ini``` file in server side.
+If you want to add pair of nickname ```mypc``` and MAC address ```aa:aa:aa:aa:aa:aa``` , add pair as described below.  
+```
+[NicknameResolutionService]  
+nick_name = xx:xx:xx:xx:xx:xx  
+mypc = aa:aa:aa:aa:aa:aa
+```
+
+After register pair of nickname and MAC address, you can use not only MAC address but also nickname as a trigger of WOL.
+```
+payload: {"mac": "mypc"}
+```
 
 ## Reference
 - [Raspberry PiからPythonでWEB経由でWoLしてみる](https://code-life.hatenablog.com/entry/raspberry-pi-wol)

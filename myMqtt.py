@@ -31,15 +31,21 @@ class MyMqtt():
 			while not self.check_port_number(port):
 				print("Invalid port number! Please retype\n: ", end="")
 				port = input()
+			print("Enter broker user name: ", end="")
+			user = input()
+			print("Enter broker password: ", end="")
+			password = input()
 			config["Broker"] = {
 				"ip": ip, 
-				"port": port
+				"port": port,
+				"user": user,
+				"pass": password
 				}
 			with open(setting_fpath, 'w') as configfile:
 				config.write(configfile)
 			print("Save setting -> {0}".format(setting_fpath))
 		
-		self.ip, self.port = self.load_settings(setting_fpath)
+		self.ip, self.port, self.user, self.password = self.load_settings(setting_fpath)
 		if not self.check_ip_address(self.ip) or not self.check_port_number(self.port):
 			print("Invalid setting values!!")
 			print("ip  : {0}".format(self.ip))
@@ -55,6 +61,7 @@ class MyMqtt():
 			self.connect_to_broker()
 	
 	def connect_to_broker(self):
+		self.client.username_pw_set(username=self.user, password=self.password)
 		self.client.connect(self.ip, port=self.port, keepalive=60)
 		self.client.loop_start()
 	
@@ -88,8 +95,9 @@ class MyMqtt():
 		config.read(fpath)
 		ip = config["Broker"]["ip"]
 		port = int(config["Broker"]["port"])
-
-		return ip, port
+		user = config["Broker"]["user"]
+		password = config["Broker"]["pass"]
+		return ip, port, user, password
 		
 	def check_port_number(self, num):
 		try:

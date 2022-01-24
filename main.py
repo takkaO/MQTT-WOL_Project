@@ -5,12 +5,14 @@ import re
 import json
 import time
 import configparser
+import datetime
 
 class WakeUpper:
 	def __init__(self):
 		self.wol = WakeOnLan()
 		self.wol.select_network_interface()
 		self.topic = "takkaO/wol"
+		self.topic_result = "takkaO/wol_result"
 		self.mnlookup_file = "./nrs.ini"
 
 		if not os.path.isfile(self.mnlookup_file):
@@ -25,19 +27,23 @@ class WakeUpper:
 
 	def on_message(self, client, userdata, msg):
 		data = json.loads(msg.payload.decode("utf-8"))
-		mac = data["mac"]
+		try:
+			mac = data["mac"]
 
-		if not self.wol.is_mac_address(mac):
-			config = configparser.ConfigParser()
-			config.read(self.mnlookup_file)
-			mac = config["NicknameResolutionService"][mac]
-			#print("Load mac from config")
+			if not self.wol.is_mac_address(mac):
+				config = configparser.ConfigParser()
+				config.read(self.mnlookup_file)
+				mac = config["NicknameResolutionService"][mac]
+				#print("Load mac from config")
 
-		if self.wol.is_mac_address(mac):
-			self.wol.send_magic_packet(mac)
-			tx_data = {"wol_res": "ok"}
-			client.publish(self.topic, json.dumps(tx_data))
-			print("Transmit WOL packet")
+			if self.wol.is_mac_address(mac):
+				self.wol.send_magic_packet(mac)
+				tx_data = {"wol_res": "ok"}
+				client.publish(self.topic_result, json.dumps(tx_data))
+				print("[", datetime.datetime.now(), "] Transmit WOL packet")
+		except:	
+			tx_data = {"wol_res": "ng"}
+			client.publish(self.topic_result, json.dumps(tx_data))
 
 
 def main():
